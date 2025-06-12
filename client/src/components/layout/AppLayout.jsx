@@ -6,6 +6,7 @@ import { Padding } from '@mui/icons-material';
 import ChatList from '../dialogs/ChatList'
 import { sampleChats } from '../../constants/sampleData';
 import { useParams } from 'react-router-dom';
+import Profile from '../specific/Profile';
 
 const AppLayout = ()=> (WrappedComponent) => {
   return (props)=>{
@@ -29,7 +30,7 @@ const AppLayout = ()=> (WrappedComponent) => {
                     />
                 </Grid>
                 <Grid  size={6} height={"100%"} ><WrappedComponent {...props} /></Grid>
-                <Grid  size={3} height={"100%"} sx={{padding:"2rem",bgcolor:"rgba(0,0,0,0.85)"}}>Third</Grid>
+                <Grid  size={3} height={"100%"} sx={{padding:"2rem",bgcolor:"rgba(0,0,0,0.85)"}}><Profile /></Grid>
             </Grid>
             </>
         )
