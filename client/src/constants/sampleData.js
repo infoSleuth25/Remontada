@@ -205,3 +205,340 @@ export const sampleMessage = [
         createdAt : '2025-06-12T22:30:00.000Z'
     }
 ]
+
+export const dashboardData = {
+    users:[
+        {
+            _id: 'u001',
+            avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+            name: 'John Doe',
+            username: 'johnd',
+            friends: 120,
+            groups: 8,
+        },
+        {
+            _id: 'u002',
+            avatar: 'https://randomuser.me/api/portraits/women/21.jpg',
+            name: 'Jane Smith',
+            username: 'janes',
+            friends: 95,
+            groups: 5,
+        },
+        {
+            _id: 'u003',
+            avatar: 'https://randomuser.me/api/portraits/men/34.jpg',
+            name: 'Michael Brown',
+            username: 'mikeb',
+            friends: 210,
+            groups: 12,
+        },
+        {
+            _id: 'u004',
+            avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+            name: 'Emily Johnson',
+            username: 'emjay',
+            friends: 88,
+            groups: 4,
+        },
+        {
+            _id: 'u005',
+            avatar: 'https://randomuser.me/api/portraits/men/51.jpg',
+            name: 'Chris Lee',
+            username: 'clee',
+            friends: 143,
+            groups: 9,
+        }
+    ],
+    chats: [
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar6.png"],
+        name: "Sophia Clark",
+        _id: "12",
+        groupChat: false,
+        members: [
+          { id: "12", avatar: "https://www.w3schools.com/w3images/avatar6.png" },
+          { id: "13", avatar: "https://www.w3schools.com/w3images/avatar2.png" }
+        ],
+        totalMembers: 2,
+        totalMessages: 18,
+        creator: {
+          name: "John Doe",
+          avatar: "https://www.w3schools.com/w3images/avatar6.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar2.png"],
+        name: "Michael Lee",
+        _id: "13",
+        groupChat: false,
+        members: [
+          { id: "13", avatar: "https://www.w3schools.com/w3images/avatar2.png" },
+          { id: "14", avatar: "https://www.w3schools.com/w3images/avatar5.png" }
+        ],
+        totalMembers: 2,
+        totalMessages: 25,
+        creator: {
+          name: "Emma Watson",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar5.png"],
+        name: "Study Buddies",
+        _id: "14",
+        groupChat: true,
+        members: [
+          { id: "14", avatar: "https://www.w3schools.com/w3images/avatar5.png" },
+          { id: "15", avatar: "https://www.w3schools.com/w3images/avatar3.png" },
+          { id: "16", avatar: "https://www.w3schools.com/w3images/avatar4.png" },
+          { id: "17", avatar: "https://www.w3schools.com/w3images/avatar2.png" }
+        ],
+        totalMembers: 4,
+        totalMessages: 92,
+        creator: {
+          name: "Chris Evans",
+          avatar: "https://www.w3schools.com/w3images/avatar5.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar3.png"],
+        name: "Liam Smith",
+        _id: "15",
+        groupChat: false,
+        members: [
+          { id: "15", avatar: "https://www.w3schools.com/w3images/avatar3.png" },
+          { id: "12", avatar: "https://www.w3schools.com/w3images/avatar6.png" }
+        ],
+        totalMembers: 2,
+        totalMessages: 12,
+        creator: {
+          name: "Sophia Clark",
+          avatar: "https://www.w3schools.com/w3images/avatar6.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar4.png"],
+        name: "Emma Johnson",
+        _id: "16",
+        groupChat: false,
+        members: [
+          { id: "16", avatar: "https://www.w3schools.com/w3images/avatar4.png" },
+          { id: "14", avatar: "https://www.w3schools.com/w3images/avatar5.png" }
+        ],
+        totalMembers: 2,
+        totalMessages: 31,
+        creator: {
+          name: "Liam Smith",
+          avatar: "https://www.w3schools.com/w3images/avatar3.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar2.png"],
+        name: "Project Team",
+        _id: "17",
+        groupChat: true,
+        members: [
+          { id: "17", avatar: "https://www.w3schools.com/w3images/avatar2.png" },
+          { id: "18", avatar: "https://www.w3schools.com/w3images/avatar1.png" },
+          { id: "19", avatar: "https://www.w3schools.com/w3images/avatar6.png" }
+        ],
+        totalMembers: 3,
+        totalMessages: 67,
+        creator: {
+          name: "Olivia Brown",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar1.png"],
+        name: "Noah Wilson",
+        _id: "18",
+        groupChat: false,
+        members: [
+          { id: "18", avatar: "https://www.w3schools.com/w3images/avatar1.png" },
+          { id: "13", avatar: "https://www.w3schools.com/w3images/avatar2.png" }
+        ],
+        totalMembers: 2,
+        totalMessages: 40,
+        creator: {
+          name: "Michael Lee",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        }
+      },
+      {
+        avatar: ["https://www.w3schools.com/w3images/avatar6.png"],
+        name: "Weekend Trip",
+        _id: "19",
+        groupChat: true,
+        members: [
+          { id: "19", avatar: "https://www.w3schools.com/w3images/avatar6.png" },
+          { id: "12", avatar: "https://www.w3schools.com/w3images/avatar6.png" },
+          { id: "14", avatar: "https://www.w3schools.com/w3images/avatar5.png" },
+          { id: "18", avatar: "https://www.w3schools.com/w3images/avatar1.png" }
+        ],
+        totalMembers: 4,
+        totalMessages: 108,
+        creator: {
+          name: "Sophia Clark",
+          avatar: "https://www.w3schools.com/w3images/avatar6.png"
+        }
+      }
+    ],
+    messages:[
+      {
+        attachments: [],
+        content: "Hey, how's it going?",
+        _id: "msg1",
+        sender: {
+          _id: "user_1",
+          name: "Alice",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        },
+        chat: "chat_001",
+        groupChat: false,
+        createdAt: "2025-06-12T10:00:00.000Z"
+      },
+      {
+        attachments: [
+          {
+            public_id: "img_001",
+            url: "https://www.w3schools.com/w3images/avatar2.png"
+          },
+        ],
+        content: "",
+        _id: "msg2",
+        sender: {
+          _id: "user_2",
+          name: "Bob",
+          avatar: "https://www.w3schools.com/w3images/avatar3.png"
+        },
+        chat: "chat_001",
+        groupChat: false,
+        createdAt: "2025-06-12T10:05:00.000Z"
+      },
+      {
+        attachments: [],
+        content: "Let's meet tomorrow.",
+        _id: "msg3",
+        sender: {
+          _id: "user_3",
+          name: "Clara",
+          avatar: "https://www.w3schools.com/w3images/avatar5.png"
+        },
+        chat: "chat_001",
+        groupChat: true,
+        createdAt: "2025-06-12T10:10:00.000Z"
+      },
+      {
+        attachments: [
+          {
+            public_id: "doc_001",
+            url: "https://file-examples-com.github.io/uploads/2017/10/file-sample_150kB.pdf"
+          }
+        ],
+        content: "",
+        _id: "msg4",
+        sender: {
+          _id: "user_1",
+          name: "Alice",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        },
+        chat: "chat_001",
+        groupChat: false,
+        createdAt: "2025-06-12T10:15:00.000Z"
+      },
+      {
+        attachments: [],
+        content: "That sounds great!",
+        _id: "msg5",
+        sender: {
+          _id: "user_2",
+          name: "Bob",
+          avatar: "https://www.w3schools.com/w3images/avatar3.png"
+        },
+        chat: "chat_001",
+        groupChat: true,
+        createdAt: "2025-06-12T10:20:00.000Z"
+      },
+      {
+        attachments: [
+          {
+            public_id: "img_002",
+            url: "https://via.placeholder.com/150/771796"
+          }
+        ],
+        content: "",
+        _id: "msg6",
+        sender: {
+          _id: "user_3",
+          name: "Clara",
+          avatar: "https://www.w3schools.com/w3images/avatar5.png"
+        },
+        chat: "chat_001",
+        groupChat: false,
+        createdAt: "2025-06-12T10:25:00.000Z"
+      },
+      {
+        attachments: [],
+        content: "Did you check the update?",
+        _id: "msg7",
+        sender: {
+          _id: "user_1",
+          name: "Alice",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        },
+        chat: "chat_002",
+        groupChat: true,
+        createdAt: "2025-06-12T10:30:00.000Z"
+      },
+      {
+        attachments: [
+          {
+            public_id: "img_003",
+            url: "https://via.placeholder.com/150/24f355"
+          }
+        ],
+        content: "",
+        _id: "msg8",
+        sender: {
+          _id: "user_2",
+          name: "Bob",
+          avatar: "https://www.w3schools.com/w3images/avatar3.png"
+        },
+        chat: "chat_002",
+        groupChat: false,
+        createdAt: "2025-06-12T10:35:00.000Z"
+      },
+      {
+        attachments: [],
+        content: "Yes, I did. Looks good.",
+        _id: "msg9",
+        sender: {
+          _id: "user_3",
+          name: "Clara",
+          avatar: "https://www.w3schools.com/w3images/avatar5.png"
+        },
+        chat: "chat_002",
+        groupChat: false,
+        createdAt: "2025-06-12T10:40:00.000Z"
+      },
+      {
+        attachments: [
+          {
+            public_id: "file_001",
+            url: "https://file-examples-com.github.io/uploads/2017/02/zip_2MB.zip"
+          }
+        ],
+        content: "",
+        _id: "msg10",
+        sender: {
+          _id: "user_1",
+          name: "Alice",
+          avatar: "https://www.w3schools.com/w3images/avatar2.png"
+        },
+        chat: "chat_002",
+        groupChat: true,
+        createdAt: "2025-06-12T10:45:00.000Z"
+      }
+    ]
+};
