@@ -1,8 +1,7 @@
-import { Box, Grid, Stack, styled, Typography } from '@mui/material'
-import React from 'react'
-import { graycolor, matBlack } from '../../constants/color'
-import { useLocation, Link as LinkComponent} from 'react-router-dom'
 import { Dashboard as DashboardIcon, ExitToApp as ExitToAppIcon, Groups as GroupsIcon, ManageAccounts as ManageAccountsIcon, Message as MessageIcon } from "@mui/icons-material";
+import { Grid, Stack, styled, Typography } from '@mui/material';
+import { Link as LinkComponent, Navigate, useLocation } from 'react-router-dom';
+import { graycolor, matBlack } from '../../constants/color';
 
 const Link = styled(LinkComponent)`
     text-decoration : none;
@@ -38,9 +37,14 @@ const adminTabs = [
     },
 ] 
 
+const isAdmin = true;
+
 const AdminLayout = ({children}) => {
     const logoutHandler = () =>{
         console.log("Log out");
+    }
+    if(!isAdmin){
+        return <Navigate to='/admin' />
     }
   return (
     <Grid container minHeight={"100vh"}>
