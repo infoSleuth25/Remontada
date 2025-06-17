@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev" : "nodemon app.js"
+    "dev": "nodemon app.js"
   },
   "author": "Siddhesh Borse",
   "license": "ISC",
@@ -21,7 +21,8 @@
     "mongoose": "^8.16.0",
     "multer": "^2.0.1",
     "socket.io": "^4.8.1",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
