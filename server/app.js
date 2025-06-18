@@ -6,8 +6,10 @@ const port = process.env.PORT || 4000;
 import cookieParser from 'cookie-parser';
 
 
+
 import connectToDB from "./utils/conn.js";
 connectToDB(process.env.DB_CONNECT)
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
