@@ -237,18 +237,54 @@ async function removeMember(req,res){
     }
 }
 
-// async function leaveGroup(req,res){
-//     try{
-//         const chatId = req.params.chatId;
-//         const chat = await Chat.findById(chatId);
-
-//     }
-//     catch(err){
-//         return res.status(500).json({
-//             err : err,
-//             msg : "Internal server error"
-//         })
-//     }
-// }
+async function leaveGroup(req,res){
+    try{
+        const chatId = req.params.chatId;
+        const chat = await Chat.findById(chatId);
+        if(!chat){
+            return res.status(404).json({
+                msg : "Group is not created"
+            })
+        }
+        if(!chat.groupChat){
+            return res.status(400).json({
+                msg : "This is not a group chat"
+            })
+        }
+        if (!chat.members.some(id => id.toString() === req.user._id.toString())) {
+            return res.status(400).json({
+                msg: "User is not a member of the group"
+            })
+        }
+        const remainingMembers = chat.members.filter(id => id.toString() !== req.user._id.toString());
+        if (remainingMembers.length < 3) {
+            await Chat.findByIdAndDelete(chat._id);
+            emitEvent(req,ALERT,chat.members,`${req.user.name} has left the group & Group had less than 3 members after removal. Group has been deleted.`);
+            emitEvent(req,REFETCH_CHATS,chat.members);
+            return res.status(200).json({
+                msg: "Group had less than 3 members after removal. Group has been deleted.",
+                deletedGroupId: chat._id
+            });
+        }
+        if(chat.creator.toString() == req.user._id.toString()){
+            const randomElement = Math.floor(Math.random()* remainingMembers.length);
+            const newCreator = remainingMembers[randomElement];
+            chat.creator = newCreator;
+        }
+        chat.members = remainingMembers;
+        await chat.save();
+        emitEvent(req,ALERT,chat.members,`${req.user.name} has left the group`);
+        return res.status(200).json({
+            msg : "User has successfully left the group",
+            groupDetails : chat
+        })        
+    }
+    catch(err){
+        return res.status(500).json({
+            err : err,
+            msg : "Internal server error"
+        })
+    }
+}
 
 export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup};
