@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import {UserRegisterValidationSchema, UserLoginValidationSchema} from '../validators/user.validator.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import BlackListToken from '../models/blackListToken.model.js'
 
 async function registerUser(req,res){
     try{
@@ -94,4 +95,41 @@ async function loginUser(req,res){
     }
 }
 
-export {registerUser, loginUser};
+async function getUserProfile(req,res){
+    try{
+        res.status(200).json(req.user);
+    }
+    catch(err){
+        return res.status(500).json({
+            err : err,
+            msg : "Internal server error"
+        })
+    }
+}
+
+async function logoutUser(req,res){
+    try{
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        await BlackListToken.create({token});
+        res.clearCookie('token');
+        res.status(200).json({
+            msg : "Logged out"
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            err : err,
+            msg : "Internal server error"
+        })
+    }
+}
+
+async function searchUser(req,res){
+    const name = req.query.name;
+    return res.status(200).json({
+        msg : "User is active",
+        name : name
+    })
+}
+
+export {registerUser, loginUser, getUserProfile, logoutUser, searchUser};

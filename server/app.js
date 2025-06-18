@@ -15,9 +15,11 @@ app.use(cookieParser());
 
 
 import userRoutes from './routes/user.route.js';
+import chatRoutes from './routes/chat.route.js';
 
 
 app.use('/user', userRoutes);
+app.use('/chat', chatRoutes);
 
 
 app.listen(port,()=>{
