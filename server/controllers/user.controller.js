@@ -3,6 +3,7 @@ import {UserRegisterValidationSchema, UserLoginValidationSchema} from '../valida
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import BlackListToken from '../models/blackListToken.model.js'
+import Chat from "../models/chat.model.js";
 
 async function registerUser(req,res){
     try{
@@ -125,10 +126,24 @@ async function logoutUser(req,res){
 }
 
 async function searchUser(req,res){
-    const name = req.query.name;
+    const {name=""} = req.query;
+    const chats = await Chat.find({groupChat:false, members:req.user._id});
+    const allFriends = chats.flatMap((chat)=> chat.members);
+    const otherUsers = await User.find({
+        _id: { $nin: allFriends },
+        $or: [
+            { name: { $regex: name, $options: "i" } },
+            { username: { $regex: name, $options: "i" } }
+        ]
+    });
+    const users = otherUsers.map(({_id,name,avatar})=>({
+        _id,
+        name,
+        avatar : avatar.url
+    }));
     return res.status(200).json({
-        msg : "User is active",
-        name : name
+        msg : "Searching a user",
+        users : users
     })
 }
 
