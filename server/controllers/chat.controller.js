@@ -1,6 +1,6 @@
 import { GroupCreateSchema } from "../validators/chat.validator.js";
 import Chat from "../models/chat.model.js";
-import { emitEvent } from "../utils/features.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
 import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import User from "../models/user.model.js";
 import Message from '../models/message.model.js';
@@ -422,4 +422,89 @@ async function renameGroup(req,res){
     }
 }
 
-export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup};
+async function deleteChat(req,res){
+    try{
+        const chatId = req.params?.id;
+        if(!chatId){
+            return res.status(400).json({
+                msg : "Please provide chat Id"
+            })
+        }
+        const chat = await Chat.findById(chatId);
+        if(!chat){
+            return res.status(400).json({
+                msg : "Chat not found"
+            })
+        }  
+        const members = chat.members;
+        if(chat.groupChat && chat.creator.toString() !== req.user._id.toString()){
+            return res.status(400).json({
+                msg : "You are not allowed to delete the group"
+            })
+        }   
+        const messageWithAttachment = await Message.find({
+            chat: chatId, 
+            attachments : {$exists:true,$ne:[]}
+        });
+        const public_ids = [];
+        messageWithAttachment.forEach(({attachments})=>
+            attachments.forEach(({public_id})=>
+                public_ids.push(public_id)
+        ))
+        await Promise.all([
+            deleteFilesFromCloudinary(public_ids),
+            chat.deleteOne(),
+            Message.deleteMany({chat:chatId})
+        ])
+        emitEvent(req,REFETCH_CHATS,members);
+        return res.status(200).json({
+            msg : "Chat is deleted Successfully",
+            chatDetails : chat
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err
+        })      
+    }
+}
+
+async function getMessages(req,res){
+    try{
+        const chatId = req.params?.id;
+        if(!chatId){
+            return res.status(400).json({
+                msg : "Please provide chat Id"
+            })
+        }
+        const {page =1} = req.query;
+        const limit = parseInt(process.env.LIMIT) || 10;
+        const skip = (page - 1) * limit;
+
+        const [messages,totalMessagesCount] = await Promise.all(
+            [Message.find({chat : chatId})
+            .sort({createdAt : -1})
+            .skip(skip)
+            .limit(limit)
+            .populate("sender","name")
+            .lean()
+            ,
+            Message.countDocuments({chat:chatId})
+        ])
+        const totalPages = Math.ceil(totalMessagesCount/ limit);
+        return res.status(200).json({
+            msg : "Messages received successfully",
+            messages : messages.reverse(),
+            totalPages : totalPages
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err
+        })      
+    }
+}
+
+export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup, deleteChat, getMessages};

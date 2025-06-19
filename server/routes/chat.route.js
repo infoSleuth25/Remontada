@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { authUser } from '../middlewares/auth.middleware.js';
-import { newGroupChat, getChats, getGroups, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup } from '../controllers/chat.controller.js';
+import { newGroupChat, getChats, getGroups, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup, deleteChat, getMessages } from '../controllers/chat.controller.js';
 import { attachmentsMulter } from '../middlewares/multer.js';
 
 router.post('/newChat',authUser,newGroupChat);
@@ -13,8 +13,10 @@ router.delete('/leave/:chatId',authUser,leaveGroup);
 
 router.post('/message',authUser,attachmentsMulter,sendAttachments);
 
+router.get('/message/:id',authUser,getMessages);
+
 router.route('/:id').get(authUser,getChatDetails)
                     .put(authUser,renameGroup)
-                    .delete(authUser);
+                    .delete(authUser,deleteChat);
 
 export default router;
