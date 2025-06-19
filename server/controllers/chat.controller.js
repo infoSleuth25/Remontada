@@ -1,8 +1,9 @@
 import { GroupCreateSchema } from "../validators/chat.validator.js";
 import Chat from "../models/chat.model.js";
 import { emitEvent } from "../utils/features.js";
-import { ALERT, REFETCH_CHATS } from "../constants/events.js";
+import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import User from "../models/user.model.js";
+import Message from '../models/message.model.js';
 
 async function newGroupChat(req,res){
     try{
@@ -287,4 +288,138 @@ async function leaveGroup(req,res){
     }
 }
 
-export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup};
+async function sendAttachments(req,res){
+    try{
+        const chatId = req.body?.chatId;
+        if(!chatId){
+            return res.status(400).json({
+                msg : "Please provide chatId"
+            })
+        }
+        const chat = await Chat.findById(chatId);
+        if(!chat){
+            return res.status(400).json({
+                msg : "Chat not found"
+            })
+        }
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(400).json({
+                msg : "User not found"
+            })
+        }
+        const files = req.files || [];
+        if(files.length < 1){
+            return res.status(400).json({
+                msg : "No files were uploaded"
+            })
+        }
+        const attachments = [];
+        const messageForRealTime = {content:"",attachments,sender:{_id:user._id,name:user.name},chat:chatId};
+        const messageForDB = {content:"",attachments,sender:user._id, chat:chatId};
+        const message = await Message.create(messageForDB);
+        emitEvent(req,NEW_ATTACHMENT,chat.members,{message : messageForRealTime, chatId});
+        emitEvent(req,NEW_MESSAGE_ALERT,chat.members,{chatId});
+        return res.status(200).json({
+            msg : "Attachements send successfully",
+            message : message
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err
+        })
+    }
+}
+
+async function getChatDetails(req,res){
+    try{
+        const chatId = req.params?.id;
+        if(!chatId){
+            return res.status(400).json({
+                msg : "Please provide chat Id"
+            })
+        }
+        if(req.query.populate === 'true'){
+            console.log('ji')
+            const chat = await Chat.findById(chatId).populate("members","name avatar").lean();
+            if(!chat){
+                return res.status(400).json({
+                    msg : "Chat not found"
+                })
+            }
+            chat.members = chat.members.map(({_id,name,avatar})=>({_id,name,avatar:avatar.url}));
+            return res.status(200).json({
+                msg : "Received Chat details successfully",
+                chatDetails : chat
+            })
+        }
+        else{
+            const chat = await Chat.findById(chatId);
+            if(!chat){
+                return res.status(400).json({
+                    msg : "Chat not found"
+                })
+            }
+            return res.status(200).json({
+                msg : "Received Chat details successfully",
+                chatDetails : chat
+            })
+        }
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err
+        })
+    }
+}
+
+async function renameGroup(req,res){
+    try{
+        const chatId = req.params?.id;
+        if(!chatId){
+            return res.status(400).json({
+                msg : "Please provide chat Id"
+            })
+        }
+        const name = req.body?.name;
+        if(!name){
+            return res.status(400).json({
+                msg : "Please provide updated name of group"
+            })
+        }
+        const chat = await Chat.findById(chatId);
+        if(!chat){
+            return res.status(400).json({
+                msg : "Chat not found"
+            })
+        }
+        if(!chat.groupChat){
+            return res.status(400).json({
+                msg : "ChatName can not be updated because it is not a group chat"
+            })
+        }
+        if(chat.creator.toString() !== req.user._id.toString()){
+            return res.status(403).json({
+                msg : "You are not allowed to rename the group"
+            })
+        }
+        chat.groupName = name;
+        await chat.save();
+        emitEvent(req,REFETCH_CHATS,chat.members);
+        return res.status(200).json({
+            msg : "Group name renamed successfully",
+            groupDetails : chat
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err
+        })
+    }
+}
+
+export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup};
