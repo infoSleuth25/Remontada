@@ -287,6 +287,43 @@ async function getAllNotifications(req,res){
     }
 }
 
+async function getAllFriends(req,res){
+    try{
+        const chatId = req.query.chatId;
+        const chat = await Chat.find({members:req.user._id,groupChat:false}).populate("members","name avatar");
+        const friends = chat.map(({members})=>{
+            const otherMember = members.find((member)=>member._id.toString() !== req.user._id.toString());
+            return {
+                _id : otherMember._id,
+                name : otherMember.name,
+                avatar : otherMember.avatar.url
+            }
+        })
+        if(chatId){
+            const chat = await Chat.findById(chatId);
+            const availableFriends = friends.filter(
+                (friend)=> !chat.members.includes(friend._id)
+            )
+            return res.status(200).json({
+                msg : "Available friends received successfully",
+                availableFriends : availableFriends
+            })
+        }
+        else{
+            return res.status(200).json({
+                msg : "All friends received successfully",
+                friends : friends
+            })
+        }
+    }
+    catch (err) {
+        return res.status(500).json({
+            msg: "Internal server error",
+            err: err.message
+        });
+    }
+}
 
 
-export {registerUser, loginUser, getUserProfile, logoutUser, searchUser,sendRequest, acceptRequest,getAllNotifications};
+
+export {registerUser, loginUser, getUserProfile, logoutUser, searchUser,sendRequest, acceptRequest,getAllNotifications,getAllFriends};
