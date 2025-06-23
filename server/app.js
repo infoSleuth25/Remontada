@@ -18,10 +18,12 @@ app.use(cookieParser());
 
 import userRoutes from './routes/user.route.js';
 import chatRoutes from './routes/chat.route.js';
+import adminRoutes from './routes/admin.route.js';
 
 
 app.use('/user', userRoutes);
 app.use('/chat', chatRoutes);
+app.use('/admin', adminRoutes);
 
 
 app.listen(port,()=>{
