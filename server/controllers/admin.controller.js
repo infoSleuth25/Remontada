@@ -1,6 +1,8 @@
 import User from '../models/user.model.js';
 import Chat from '../models/chat.model.js';
 import Message from '../models/message.model.js';
+import jwt from 'jsonwebtoken';
+import BlackListToken from '../models/blackListToken.model.js';
 
 async function getAllUsers(req,res){
     try{
@@ -110,4 +112,94 @@ async function getAllMessages(req,res){
     }
 }
 
-export {getAllUsers, getAllChats, getAllMessages};
+async function getDashboardStats(req,res){
+    try{
+        const [groupsCount,usersCount, messagesCount, totalChatsCount] = await Promise.all([
+            Chat.countDocuments({groupChat:true}),
+            User.countDocuments(),
+            Message.countDocuments(),
+            Chat.countDocuments()
+        ])
+        const today = new Date();
+        const last7Days = new Date();
+        last7Days.setDate(last7Days.getDate()-7);
+        const last7DaysMessages = await Message.find({
+            createdAt : {
+                $gte : last7Days,
+                $lte : today
+            }
+        }).select("createdAt");
+        const messages = new Array(7).fill(0);
+        const dayinMiliSeconds = 1000*60*60*24;
+        console.log(dayinMiliSeconds);
+        last7DaysMessages.forEach(message=>{
+            const index = Math.floor((today.getTime() - message.createdAt.getTime() ) / dayinMiliSeconds);
+            messages[6-index]++;
+        })
+        const stats = {
+            groupsCount,
+            usersCount,
+            messagesCount, 
+            totalChatsCount,
+            messagesChart : messages
+        }
+        return res.status(200).json({
+            msg : "Dashboard stats received successfully",
+            stats : stats
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err.message
+        })      
+    }
+}
+
+async function adminLogin(req,res){
+    try{
+        const secretKey = req.body?.secretKey;
+        if(!secretKey){
+            return res.status(400).json({
+                msg : "Please provide secret key"
+            })
+        }
+        const adminSecretKey = process.env.ADMIN_SECRET_KEY;
+        const isMatch = secretKey === adminSecretKey;
+        if(!isMatch){
+            return res.status(401).json({
+                msg : "Invalid secret key"
+            })
+        }
+        const token = jwt.sign(secretKey,process.env.JWT_SECRET);
+        res.cookie('admintoken',token);
+        return res.status(200).json({
+            msg : "You have successfully logged In",
+            token : token
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err.message
+        })      
+    }
+}
+
+async function adminLogout(req,res){
+    try{
+        const token = req.cookies.admintoken;
+        res.clearCookie('admintoken');
+        res.status(200).json({
+            msg : "Logged out"
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err.message
+        })      
+    }
+}
+
+export {getAllUsers, getAllChats, getAllMessages, getDashboardStats, adminLogin, adminLogout};

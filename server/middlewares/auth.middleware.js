@@ -27,3 +27,28 @@ export async function authUser(req,res,next){
         })
     }
 }
+
+
+export async function authAdmin(req,res,next){
+    const token = req.cookies.admintoken;
+    if(!token){
+        return res.status(401).json({
+            msg : "Unauthorized"
+        })
+    }
+    try{
+        const secretKey = jwt.verify(token, process.env.JWT_SECRET);
+        const isMatch = secretKey === process.env.ADMIN_SECRET_KEY;
+        if(!isMatch){
+            return res.status(401).json({
+                msg : "Unauthorized"
+            })
+        }
+        return next();
+    }
+    catch(err){
+        return res.status(401).json({
+            msg : "Unauthorized"
+        })
+    }
+}

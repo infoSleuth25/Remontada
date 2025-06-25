@@ -1,9 +1,13 @@
 import express from 'express';
-import { getAllUsers, getAllChats, getAllMessages } from '../controllers/admin.controller.js';
+import { getAllUsers, getAllChats, getAllMessages,getDashboardStats, adminLogin, adminLogout } from '../controllers/admin.controller.js';
+import { authAdmin } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
-router.get('/users',getAllUsers);
-router.get('/chats',getAllChats);
-router.get('/messages',getAllMessages);
+router.post('/verify',adminLogin);
+router.get('/users',authAdmin,getAllUsers);
+router.get('/chats',authAdmin,getAllChats);
+router.get('/messages',authAdmin,getAllMessages);
+router.get('/dashboard',authAdmin,getDashboardStats);
+router.get('/logout',authAdmin,adminLogout);
 
 export default router;
