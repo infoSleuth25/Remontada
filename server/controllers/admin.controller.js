@@ -76,4 +76,38 @@ async function getAllChats(req,res){
     }
 }
 
-export {getAllUsers, getAllChats};
+async function getAllMessages(req,res){
+    try{
+        const messages = await Message.find({})
+            .populate("sender","name avatar")
+            .populate("chat","groupChat");
+
+        const transformedMessages = messages.map(({_id,content,attachments,sender,chat,createdAt})=>({
+            _id,
+            attachments,
+            content,
+            createdAt,
+            chat: chat._id,
+            groupChat : chat.groupChat,
+            sender : {
+                _id : sender._id,
+                name : sender.name,
+                avatar : sender.avatar.url
+            }
+
+        }))
+
+        return res.status(200).json({
+            msg : "Messages received successfully",
+            messages : transformedMessages
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            msg : "Internal server error",
+            err : err.message
+        })      
+    }
+}
+
+export {getAllUsers, getAllChats, getAllMessages};
