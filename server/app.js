@@ -4,6 +4,8 @@ import express from 'express';
 import {Server} from 'socket.io';
 import http from 'http';
 import {v4 as uuid} from 'uuid';
+import cors from 'cors';
+
 
 const app = express();
 const server = http.createServer(app);
@@ -20,6 +22,11 @@ connectToDB(process.env.DB_CONNECT)
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(cookieParser());
+app.use(cors({
+    origin : ["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
+    credentials : true,
+
+}))
 
 
 import userRoutes from './routes/user.route.js';
@@ -33,9 +40,9 @@ import Message from './models/message.model.js';
 const userSocketIDs = new Map();
 
 
-app.use('/user', userRoutes);
-app.use('/chat', chatRoutes);
-app.use('/admin', adminRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // io.use((socket,next)=>{
 

@@ -4,6 +4,11 @@ import {CameraAlt as CameraAltIcon} from '@mui/icons-material'
 import { VisuallyHiddenInput } from '../components/styles/StyledComponent';
 import {useFileHandler, useInputValidation, useStrongPassword} from '6pp';
 import {usernameValidator} from '../utils/validator'
+import axios from 'axios';
+import { server } from '../constants/config';
+import { useDispatch } from 'react-redux';
+import { userExists } from '../redux/reducers/auth';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,11 +18,49 @@ const Login = () => {
   const username = useInputValidation('',usernameValidator);
   const password = useStrongPassword();
   const avatar = useFileHandler("single");
-  const handleLogin = (e) =>{
+  const dispatch = useDispatch();
+  const handleLogin = async(e) =>{
     e.preventDefault();
+    const config = {
+      withCredentials: true,
+      headers:{
+        "Content-Type" : 'application/json'
+      }
+    };
+    try{
+      const {data} = await axios.post(`${server}/api/v1/user/login`,{
+        username : username.value,
+        password : password.value
+      },config)
+      dispatch(userExists(true));
+      toast.success(data.msg);
+    }
+    catch(err){
+      toast.error(err?.response?.data?.msg  || "Something went wrong");
+    }
   }
-  const handleSignUp = (e) => {
+  const handleSignUp = async(e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("avatar",avatar.file);
+    formData.append("name",name.value);
+    formData.append("bio",bio.value);
+    formData.append("username",username.value);
+    formData.append("password",password.value);
+    const config = {
+      withCredentials: true,
+      headers:{
+        "Content-Type" : 'multipart/form-data'
+      }
+    }; 
+    try{
+      const {data} = axios.post(`${server}/api/v1/user/register`,formData,config);
+      dispatch(userExists(true));
+      toast.success(data.msg);
+    }
+    catch(err){
+      toast.error(err?.response?.data?.msg  || "Something went wrong");
+    }
   }
   return (
     <div style={{
