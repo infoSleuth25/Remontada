@@ -5,59 +5,95 @@ import jwt from 'jsonwebtoken'
 import BlackListToken from '../models/blackListToken.model.js'
 import Chat from "../models/chat.model.js";
 import Request from "../models/request.model.js";
-import {emitEvent} from '../utils/features.js'
+import {emitEvent, uploadFilesToCloudinary} from '../utils/features.js'
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
 import { request } from "express";
 
-async function registerUser(req,res){
-    try{
-        const name = req.body?.name;
-        const username = req.body?.username;
-        const password = req.body?.password;
-        const avatar = req.body?.avatar;
-        const bio = req.body?.bio;
-        if(!name || !username || !password || !avatar.public_id || !avatar.url || !bio){
-            return res.status(400).json({
-                msg : "All fields are required"
-            })
-        }  
-        const result = UserRegisterValidationSchema.safeParse(req.body);
-        if(!result.success){
-            return res.status(400).json({
-                msg : "Please enter valid input data",
-                error : result.error.errors
-            })
-        }
-        const isUserAlreadyExists = await User.findOne({username});
-        if(isUserAlreadyExists){
-            return res.status(400).json({
-                msg : "Username which you have provided is already in use"
-            })
-        }
-        const saltRounds = parseInt(process.env.SALT_ROUNDS) || 8;
-        const hashPassword = await bcrypt.hash(password,saltRounds);
-        const user = await User.create({
-            name : name,
-            username : username,
-            bio : bio,
-            password : hashPassword,
-            avatar : avatar
-        })
-        const token = jwt.sign({_id: user._id},process.env.JWT_SECRET,{expiresIn : '24h'});
-        res.cookie('token',token);
-        return res.status(201).json({
-            msg : "User is successfully registered",
-            user : user,
-            token : token
-        })
+async function registerUser(req, res) {
+  try {
+    const { name, username, password, bio } = req.body;
+    const file = req.file;
+
+    // Check if any required field is missing
+    if (!name || !username || !password || !bio || !file) {
+      return res.status(400).json({
+        msg: "All fields including avatar are required",
+      });
     }
-    catch(err){
-        return res.status(500).json({
-            err : err,
-            msg : "Internal server error"
-        })
+
+    // Validate input fields
+    const result = UserRegisterValidationSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({
+        msg: "Please enter valid input data",
+        error: result.error.errors,
+      });
     }
+
+    // Check if username is already taken
+    const isUserAlreadyExists = await User.findOne({ username });
+    if (isUserAlreadyExists) {
+      return res.status(400).json({
+        msg: "Username is already registered",
+      });
+    }
+
+    // Upload avatar to Cloudinary
+    let avatar;
+    try {
+      const fileUploader = await uploadFilesToCloudinary([file]);
+      if (!fileUploader || !fileUploader[0]) {
+        throw new Error("File upload failed");
+      }
+      avatar = {
+        public_id: fileUploader[0].public_id,
+        url: fileUploader[0].url,
+      };
+    } catch (cloudErr) {
+      return res.status(500).json({
+        msg: "Failed to upload avatar image",
+        error: cloudErr.message || cloudErr,
+      });
+    }
+
+    // Hash the password
+    const saltRounds = parseInt(process.env.SALT_ROUNDS) || 8;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create new user
+    const user = await User.create({
+      name,
+      username,
+      bio,
+      password: hashedPassword,
+      avatar,
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { _id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    // Set token cookie
+    res.cookie("token", token);
+
+    // Send response
+    return res.status(201).json({
+      msg: "User successfully registered",
+      user,
+      token,
+    });
+  } 
+  catch (err) {
+    return res.status(500).json({
+      msg: "Internal server error",
+      error: err.message || err,
+    });
+  }
 }
+
 
 async function loginUser(req,res){
     try{
@@ -104,7 +140,9 @@ async function loginUser(req,res){
 
 async function getUserProfile(req,res){
     try{
-        res.status(200).json(req.user);
+        res.status(200).json({
+            user : req.user
+        });
     }
     catch(err){
         return res.status(500).json({

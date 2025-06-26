@@ -32,7 +32,7 @@ const Login = () => {
         username : username.value,
         password : password.value
       },config)
-      dispatch(userExists(true));
+      dispatch(userExists(data.user));
       toast.success(data.msg);
     }
     catch(err){
@@ -54,8 +54,8 @@ const Login = () => {
       }
     }; 
     try{
-      const {data} = axios.post(`${server}/api/v1/user/register`,formData,config);
-      dispatch(userExists(true));
+      const {data} = await axios.post(`${server}/api/v1/user/register`,formData,config);
+      dispatch(userExists(data.user));
       toast.success(data.msg);
     }
     catch(err){

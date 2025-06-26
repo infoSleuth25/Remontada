@@ -4,6 +4,9 @@ import {Menu as MenuIcon, Search as SearchIcon, Add as AddIcon, Group as GroupIc
 import { orange } from '../../constants/color'
 import {useNavigate} from 'react-router-dom'
 import { Suspense } from 'react'
+import axios from 'axios'
+import { server } from '../../constants/config';
+
 
 const SearchDialog = lazy(()=>import('../dialogs/Search'));
 const NotificationDialog = lazy(()=>import('../dialogs/Notifications'));
@@ -28,7 +31,7 @@ const Header = () => {
   }
 
   const logoutHandler = () =>{
-    console.log("logout")
+    axios.get(`${server}/api/v1/user/logout`)
   }
 
   const navigateTogroup = () =>{
