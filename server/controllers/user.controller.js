@@ -174,6 +174,9 @@ async function searchUser(req,res){
         const {name=""} = req.query;
         const chats = await Chat.find({groupChat:false, members:req.user._id});
         const allFriends = chats.flatMap((chat)=> chat.members);
+        if(allFriends.length === 0){
+            allFriends.push(req.user._id);
+        }
         const otherUsers = await User.find({
             _id: { $nin: allFriends },
             $or: [
@@ -213,15 +216,22 @@ async function sendRequest(req,res){
                 msg : "Please enter valid userId to send friend request"
             })
         }
-        const isRequestExists = await Request.findOne({
-            $or :[
-                {sender: req.user._id, receiver : userId},
-                {sender: userId, receiver : req.user._id}
-            ]
+        const isRequestExists1 = await Request.findOne({
+            sender: req.user._id, 
+            receiver : userId
         });
-        if(isRequestExists){
+        const isRequestExists2 = await Request.findOne({
+            sender: userId, 
+            receiver : req.user._id
+        })
+        if(isRequestExists1){
             return res.status(400).json({
-                msg : "Request is already sent or User had already sent you a request"
+                msg : "Request is already sent"
+            })
+        }
+        if(isRequestExists2){
+            return res.status(400).json({
+                msg : "User has already sent you a request, Check in Notifications..."
             })
         }
         const request = await Request.create({

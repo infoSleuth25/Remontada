@@ -6,8 +6,9 @@ import {useNavigate} from 'react-router-dom'
 import { Suspense } from 'react'
 import axios from 'axios'
 import { server } from '../../constants/config';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
+import {setIsSearch} from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
 
 
@@ -17,22 +18,20 @@ const NewGroupDialog = lazy(()=>import('../dialogs/NewGroup'));
  
 const Header = () => {
   const dispatch = useDispatch();
-  const [isSearch, setIsSearch] = useState(false);
+  const {isSearch} = useSelector((state)=>state.misc)
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const navigate = useNavigate();
 
-  const openSearch = () =>{
-    setIsSearch(prev=> !prev);
-  }
+  const openSearch = () => dispatch(setIsSearch(true));
+  
 
   const openNewGroup = () =>{
     setIsNewGroup(prev=> !prev);
   }
 
-  const openNotification = () =>{
-    setIsNotification(prev=> !prev);
-  }
+  const openNotification = () => setIsNotification(prev=> !prev);
+
 
   const logoutHandler = async() =>{
     try{
