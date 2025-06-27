@@ -23,7 +23,6 @@ const Search = () => {
       const res = await sendFriendRequest({userId : id});
       if(res.data){
         toast.success(res.data.msg);
-        console.log(res.data);
       }
       else{
         toast.error(res?.error?.data?.msg || "Something went wrong");
