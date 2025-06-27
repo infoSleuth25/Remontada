@@ -24,7 +24,7 @@ const miscSlice = createSlice({
         setIsAddMember : (state,action) =>{
             state.isAddMember = action.payload;
         },
-        setIsAddNotification : (state,action) =>{
+        setIsNotification : (state,action) =>{
             state.isNotification = action.payload;
         },
         setIsSearch : (state,action) =>{
@@ -49,7 +49,7 @@ export default miscSlice;
 export const {
     setIsAddMember,
     setIsNewGroup,
-    setIsAddNotification,
+    setIsNotification,
     setIsSearch,
     setIsFileMenu,
     setIsDeleteMenu,
