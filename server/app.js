@@ -6,11 +6,15 @@ import http from 'http';
 import {v4 as uuid} from 'uuid';
 import cors from 'cors';
 import {v2 as cloudinary} from 'cloudinary';
+import { corsOptions } from './constants/config.js';
+
 
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server,{});
+const io = new Server(server,{
+    cors:corsOptions
+});
 const port = process.env.PORT || 4000;
 import cookieParser from 'cookie-parser';
 
@@ -28,11 +32,7 @@ cloudinary.config({
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(cookieParser());
-app.use(cors({
-    origin : ["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
-    credentials : true,
-
-}))
+app.use(cors(corsOptions))
 
 
 import userRoutes from './routes/user.route.js';
@@ -41,6 +41,7 @@ import adminRoutes from './routes/admin.route.js';
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/events.js';
 import { getSockets } from './utils/features.js';
 import Message from './models/message.model.js';
+import { socketAuthenticator } from './middlewares/socketAuthenticator.js';
 
 
 const userSocketIDs = new Map();
@@ -50,15 +51,15 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
-// io.use((socket,next)=>{
-
-// })
+io.use((socket,next)=>{
+    cookieParser()(socket.request, socket.request.res,async(err)=>{
+        await socketAuthenticator(err,socket,next);
+    });
+})
 
 io.on("connection",(socket)=>{
-    const user = {
-        _id : "fndsjcxk",
-        name : "ISifuj",
-    }
+    const user = socket.user;
+    console.log(user);
     userSocketIDs.set(user._id.toString(),socket.id);
     console.log(userSocketIDs);
     socket.on(NEW_MESSAGE,async({chatId,members,message})=>{

@@ -10,13 +10,15 @@ import Profile from '../specific/Profile';
 import {useMyChatsQuery} from '../../redux/api/api';
 import { useSelector } from 'react-redux';
 import { useErrors } from '../../hooks/hook';
+import { getSocket } from '../../socket';
 
 const AppLayout = ()=> (WrappedComponent) => {
   return (props)=>{
         const params = useParams();
         const chatId = params.chatId;
 
-
+        const socket = getSocket();
+        console.log(socket.id);
         const {isLoading,data,isError,error,refetch} = useMyChatsQuery("");
         const {user} = useSelector((state)=>state.auth); 
 

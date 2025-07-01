@@ -7,6 +7,7 @@ import { server } from './constants/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { userExists, userNotExists } from './redux/reducers/auth';
 import {Toaster} from 'react-hot-toast'
+import {SocketProvider} from './socket'
 
 const Home = lazy(()=> import('./pages/Home'));
 const Login = lazy(()=> import('./pages/Login'));
@@ -32,10 +33,10 @@ const App = () => {
     <BrowserRouter>
     <Suspense fallback={<LayoutLoader/>}>
       <Routes>
-        <Route path='/' element={ <ProtectRoute user={user}> <Home/> </ProtectRoute> } />
+        <Route path='/' element={<SocketProvider><ProtectRoute user={user}> <Home/> </ProtectRoute> </SocketProvider>} />
         <Route path='/login' element={<ProtectRoute user={!user} redirect='/'> <Login/> </ProtectRoute>} />
-        <Route path='/chat/:chatId' element={<ProtectRoute user={user}> <Chat/> </ProtectRoute>} />
-        <Route path='/groups' element={<ProtectRoute user={user}> <Groups/> </ProtectRoute>} />
+        <Route path='/chat/:chatId' element={<SocketProvider><ProtectRoute user={user}> <Chat/> </ProtectRoute></SocketProvider>} />
+        <Route path='/groups' element={<SocketProvider><ProtectRoute user={user}> <Groups/> </ProtectRoute></SocketProvider>} />
         <Route path='/admin' element={<AdminLogin />} />
         <Route path='/admin/dashboard' element={<Dashboard />} />
         <Route path='/admin/user-management' element={<UserManagement />} />
