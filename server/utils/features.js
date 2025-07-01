@@ -1,4 +1,3 @@
-import { rejects } from "assert";
 import { userSocketIDs } from "../app.js";
 import {v4 as uuid} from 'uuid';
 import {v2 as cloudinary} from 'cloudinary';
@@ -13,7 +12,7 @@ export const deleteFilesFromCloudinary = async(public_ids) =>{
 }
 
 export const getSockets = (users=[]) =>{
-    const sockets = users.map(user=>userSocketIDs.get(user._id.toString()));
+    const sockets = users.map(user=>userSocketIDs.get(user.toString()));
     return sockets;
 } 
 
