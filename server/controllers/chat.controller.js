@@ -479,7 +479,7 @@ async function getMessages(req,res){
             })
         }
         const {page =1} = req.query;
-        const limit = parseInt(process.env.LIMIT) || 10;
+        const limit = parseInt(process.env.LIMIT) || 15;
         const skip = (page - 1) * limit;
 
         const [messages,totalMessagesCount] = await Promise.all(

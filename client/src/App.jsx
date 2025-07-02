@@ -33,10 +33,12 @@ const App = () => {
     <BrowserRouter>
     <Suspense fallback={<LayoutLoader/>}>
       <Routes>
-        <Route path='/' element={<SocketProvider><ProtectRoute user={user}> <Home/> </ProtectRoute> </SocketProvider>} />
+        <Route element={<SocketProvider><ProtectRoute user={user}/></SocketProvider>}>
+          <Route path='/' element={<Home />}/>
+          <Route path='/chat/:chatId' element={<Chat />}/>
+          <Route path='/groups' element={<Groups />}/>
+        </Route>
         <Route path='/login' element={<ProtectRoute user={!user} redirect='/'> <Login/> </ProtectRoute>} />
-        <Route path='/chat/:chatId' element={<SocketProvider><ProtectRoute user={user}> <Chat/> </ProtectRoute></SocketProvider>} />
-        <Route path='/groups' element={<SocketProvider><ProtectRoute user={user}> <Groups/> </ProtectRoute></SocketProvider>} />
         <Route path='/admin' element={<AdminLogin />} />
         <Route path='/admin/dashboard' element={<Dashboard />} />
         <Route path='/admin/user-management' element={<UserManagement />} />

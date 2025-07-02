@@ -7,7 +7,6 @@ export const socketAuthenticator = async (err, socket, next) => {
             return next(new Error("Please login to access the route"));
         }
         const authToken = socket.request.cookies?.token;
-
         if (!authToken) {
             return next(new Error("Please login to access the route"));
         }

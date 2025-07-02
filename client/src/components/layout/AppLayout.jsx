@@ -18,6 +18,7 @@ const AppLayout = ()=> (WrappedComponent) => {
         const chatId = params.chatId;
 
         const socket = getSocket();
+        console.log(socket.id);
         const {isLoading,data,isError,error,refetch} = useMyChatsQuery("");
         const {user} = useSelector((state)=>state.auth); 
 
