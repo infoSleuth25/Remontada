@@ -1,6 +1,6 @@
 import { AttachFile as AttachFileIcon, Send as SendIcon } from '@mui/icons-material';
 import { IconButton, Skeleton, Stack } from '@mui/material';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import FileMenu from '../components/dialogs/FileMenu';
 import AppLayout from '../components/layout/AppLayout';
 import MessageComponent from '../components/shared/MessageComponent';
@@ -55,9 +55,20 @@ const Chat = ({chatId}) => {
     socket.emit(NEW_MESSAGE,{chatId,members,message});
     setMessage('');
   }
+
+  useEffect(()=>{
+    return ()=>{
+      setMessage('');
+      setMessages([]);
+      setOldMessages([]);
+      setPage(1);
+    }
+  },[chatId])
+
   const newMessagesHandler = useCallback((data) =>{
+    if(data.chatId !== chatId) return ; 
     setMessages((prev)=>[...prev,data.message]);
-  },[]);
+  },[chatId]);
   const eventHandlers = {[NEW_MESSAGE]:newMessagesHandler};
   useSocketEvents(socket,eventHandlers);
   useErrors(errors);

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Header from './Header';
 import Title from '../shared/Title';
 import { Grid, Skeleton } from '@mui/material';
@@ -8,14 +8,17 @@ import { sampleChats } from '../../constants/sampleData';
 import { useParams } from 'react-router-dom';
 import Profile from '../specific/Profile';
 import {useMyChatsQuery} from '../../redux/api/api';
-import { useSelector } from 'react-redux';
-import { useErrors } from '../../hooks/hook';
+import { useDispatch, useSelector } from 'react-redux';
+import { useErrors, useSocketEvents } from '../../hooks/hook';
 import { getSocket } from '../../socket';
+import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events';
+import { incrementNotification } from '../../redux/reducers/chat';
 
 const AppLayout = ()=> (WrappedComponent) => {
   return (props)=>{
         const params = useParams();
         const chatId = params.chatId;
+        const dispatch = useDispatch();
 
         const socket = getSocket();
         console.log(socket.id);
@@ -28,6 +31,20 @@ const AppLayout = ()=> (WrappedComponent) => {
             e.preventDefault();
             console.log("Delete Chat",_id,groupChat);
         }
+
+        const newMessageAlertHandler = useCallback(()=>{
+
+        },[])
+
+        const newRequestHandler = useCallback(()=>{
+            dispatch(incrementNotification());
+        },[dispatch]);
+
+        const eventHandlers = {
+            [NEW_MESSAGE_ALERT]:newMessageAlertHandler,
+            [NEW_REQUEST]:newRequestHandler,
+        };
+        useSocketEvents(socket,eventHandlers);
         return (
             <>
             <Title />
