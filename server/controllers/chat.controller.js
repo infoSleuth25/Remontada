@@ -1,9 +1,9 @@
-import { GroupCreateSchema } from "../validators/chat.validator.js";
+import { ALERT, NEW_MESSAGE, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import Chat from "../models/chat.model.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
-import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
-import User from "../models/user.model.js";
 import Message from '../models/message.model.js';
+import User from "../models/user.model.js";
+import { deleteFilesFromCloudinary, emitEvent, uploadFilesToCloudinary } from "../utils/features.js";
+import { GroupCreateSchema } from "../validators/chat.validator.js";
 
 async function newGroupChat(req,res){
     try{
@@ -314,11 +314,11 @@ async function sendAttachments(req,res){
                 msg : "No files were uploaded"
             })
         }
-        const attachments = [];
+        const attachments = await uploadFilesToCloudinary(files);
         const messageForRealTime = {content:"",attachments,sender:{_id:user._id,name:user.name},chat:chatId};
         const messageForDB = {content:"",attachments,sender:user._id, chat:chatId};
         const message = await Message.create(messageForDB);
-        emitEvent(req,NEW_ATTACHMENT,chat.members,{message : messageForRealTime, chatId});
+        emitEvent(req,NEW_MESSAGE,chat.members,{message : messageForRealTime, chatId});
         emitEvent(req,NEW_MESSAGE_ALERT,chat.members,{chatId});
         return res.status(200).json({
             msg : "Attachements send successfully",
@@ -507,4 +507,4 @@ async function getMessages(req,res){
     }
 }
 
-export {newGroupChat, getChats, getGroups, addMembers , removeMember, leaveGroup, sendAttachments, getChatDetails, renameGroup, deleteChat, getMessages};
+export { addMembers, deleteChat, getChatDetails, getChats, getGroups, getMessages, leaveGroup, newGroupChat, removeMember, renameGroup, sendAttachments };
