@@ -7,8 +7,11 @@ import { StyledLink } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import {sampleChats, sampleUsers} from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem';
+import { useMyGroupsQuery } from '../redux/api/api';
 const ConfirmDeleteDialog = lazy(()=>import('../components/dialogs/ConfirmDeleteDialog'));
 const AddMemberDialog = lazy(()=>import('../components/dialogs/AddMemberDialog'));
+import {useErrors} from '../hooks/hook';
+import {LayoutLoader} from '../components/layout/Loaders'
 
 const isAddMember = false;
 
@@ -20,6 +23,16 @@ const Groups = () => {
   const [groupNameUpdatedValue,setGroupNameUpdatedValue] = useState('')
   const chatId = useSearchParams()[0].get('group');
   const navigate = useNavigate();
+
+  const myGroups = useMyGroupsQuery("");
+  console.log(myGroups.data);
+
+  const errors = [{
+    isError : myGroups.isError,
+    error : myGroups.error
+  }]
+  useErrors(errors);
+
   const navigateBack = () =>{
     navigate('/');
   };
@@ -108,7 +121,7 @@ const Groups = () => {
       <Button size='large' variant='contained' startIcon={<AddIcon />} onClick={OpenAddMemberHandler}>Add Member</Button>
     </Stack>
   )
-  return (
+  return myGroups.isLoading? <LayoutLoader /> : (
     <Grid container height={"100vh"}>
       <Grid  sx={{display:"block"}} size={4} bgcolor={"bisque"}>
         <GroupsList myGroups={sampleChats} chatId={chatId} />
