@@ -39,7 +39,7 @@ app.use(cors(corsOptions))
 import userRoutes from './routes/user.route.js';
 import chatRoutes from './routes/chat.route.js';
 import adminRoutes from './routes/admin.route.js';
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/events.js';
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './constants/events.js';
 import { getSockets } from './utils/features.js';
 import Message from './models/message.model.js';
 import { socketAuthenticator } from './middlewares/socketAuthenticator.js';
@@ -95,6 +95,14 @@ io.on("connection",(socket)=>{
             console.log(err);
         }
         
+    })
+    socket.on(START_TYPING,({members,chatId})=>{
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(START_TYPING,{chatId});  
+    })
+    socket.on(STOP_TYPING,({members,chatId})=>{
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(STOP_TYPING,{chatId});
     })
     socket.on("disconnect",()=>{
         userSocketIDs.delete(user._id.toString());
