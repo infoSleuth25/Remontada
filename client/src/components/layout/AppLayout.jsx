@@ -1,7 +1,7 @@
 import { Grid, Skeleton } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events';
 import { useErrors, useSocketEvents } from '../../hooks/hook';
 import { useMyChatsQuery } from '../../redux/api/api';
@@ -18,6 +18,7 @@ const AppLayout = ()=> (WrappedComponent) => {
         const params = useParams();
         const chatId = params.chatId;
         const dispatch = useDispatch();
+        const navigate = useNavigate();
 
         const socket = getSocket();
         console.log(socket.id);

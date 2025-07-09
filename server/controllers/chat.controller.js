@@ -479,6 +479,17 @@ async function getMessages(req,res){
                 msg : "Please provide chat Id"
             })
         }
+        const chat = await Chat.findById(chatId);
+        if(!chat){
+            return res.status(400).json({
+                msg : "Chat not found"
+            })
+        }
+        if(!chat.members.includes(req.user._id.toString())){
+            return res.status(400).json({
+                msg : "You are not allowed to access the chat"
+            })
+        }
         const {page =1} = req.query;
         const limit = parseInt(process.env.LIMIT) || 15;
         const skip = (page - 1) * limit;

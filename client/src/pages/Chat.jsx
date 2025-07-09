@@ -15,11 +15,13 @@ import {useInfiniteScrollTop} from '6pp'
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeNewMessagesAlert } from '../redux/reducers/chat';
 import { TypingLoader } from '../components/layout/Loaders';
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 const Chat = ({chatId}) => {
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
@@ -95,6 +97,7 @@ const Chat = ({chatId}) => {
       })
     }
   },[messages])
+
 
   const newMessagesHandler = useCallback((data) =>{
     if(data.chatId !== chatId) return ; 
