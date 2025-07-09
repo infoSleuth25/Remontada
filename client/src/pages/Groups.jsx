@@ -7,20 +7,23 @@ import { StyledLink } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import {sampleChats, sampleUsers} from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem';
-import { useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/api/api';
+import { useAddGroupMembersMutation, useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/api/api';
 const ConfirmDeleteDialog = lazy(()=>import('../components/dialogs/ConfirmDeleteDialog'));
 const AddMemberDialog = lazy(()=>import('../components/dialogs/AddMemberDialog'));
 import {useErrors} from '../hooks/hook';
 import {LayoutLoader} from '../components/layout/Loaders'
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import {setIsAddMember} from '../redux/reducers/misc';
 
-const isAddMember = false;
 
 const Groups = () => {
+  const dispatch = useDispatch();
   const [isEdit, setIsEdit] = useState(false);
   const [groupName,setGroupName] = useState('');
   const [confiremDeleteDialog, setConfirmDeleteDialog] = useState(false);
   const [members, setMembers] = useState([]);
+  const {isAddMember} = useSelector((state)=>state.misc)
 
   const [groupNameUpdatedValue,setGroupNameUpdatedValue] = useState('')
   const chatId = useSearchParams()[0].get('group');
@@ -64,9 +67,19 @@ const Groups = () => {
     navigate('/');
   };
 
-  const removeMemberHandler = (id)=>{
-    console.log("Remove member", id);
-  }
+  const removeMemberHandler = async (userId) => {
+    try {
+      await removeMember({ chatId, userId }).unwrap();
+      toast.success("Member removed successfully");
+
+      // // Optionally update local state to reflect change immediately
+      // setMembers(prev => prev.filter(member => member._id !== userId));
+    } 
+    catch (err) {
+      toast.error(err?.data?.msg || "Failed to remove member");
+    }
+  };
+
   
   const updateGroupName = async() =>{
     if (!groupNameUpdatedValue.trim()) {
@@ -100,7 +113,7 @@ const Groups = () => {
   }
 
   const OpenAddMemberHandler = () =>{
-    console.log("Add Member");
+    dispatch(setIsAddMember(true));
   }
 
   useEffect(()=>{
@@ -215,7 +228,7 @@ const Groups = () => {
       {
         isAddMember &&
         <Suspense fallback={<Backdrop open />}>
-          <AddMemberDialog />
+          <AddMemberDialog chatId={chatId} />
         </Suspense>
       }
       {

@@ -220,11 +220,12 @@ async function removeMember(req,res){
                 msg: "User is not a member of the group"
             })
         }
+        const allChatMembers = chat.members.map((i)=>i.toString());
         chat.members = chat.members.filter(id => id.toString() !== userId.toString());
         chat.save();
 
         emitEvent(req,ALERT,chat.members,`${user.name} has been removed from the group`);
-        emitEvent(req,REFETCH_CHATS,chat.members);
+        emitEvent(req,REFETCH_CHATS,allChatMembers);
         return res.status(200).json({
             msg: "User has been removed from the group successfully",
             groupDetails: chat
