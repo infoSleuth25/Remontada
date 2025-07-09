@@ -2,7 +2,7 @@ import { Grid, Skeleton } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events';
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events';
 import { useErrors, useSocketEvents } from '../../hooks/hook';
 import { useMyChatsQuery } from '../../redux/api/api';
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat';
@@ -47,9 +47,14 @@ const AppLayout = ()=> (WrappedComponent) => {
             dispatch(incrementNotification());
         },[dispatch]);
 
+        const refetchHandler = useCallback(()=>{
+            refetch();
+        },[refetch]);
+
         const eventHandlers = {
             [NEW_MESSAGE_ALERT]:newMessageAlertHandler,
             [NEW_REQUEST]:newRequestHandler,
+            [REFETCH_CHATS]:refetchHandler,
         };
         useSocketEvents(socket,eventHandlers);
         return (

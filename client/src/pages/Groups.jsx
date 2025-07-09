@@ -7,11 +7,12 @@ import { StyledLink } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import {sampleChats, sampleUsers} from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem';
-import { useMyGroupsQuery } from '../redux/api/api';
+import { useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/api/api';
 const ConfirmDeleteDialog = lazy(()=>import('../components/dialogs/ConfirmDeleteDialog'));
 const AddMemberDialog = lazy(()=>import('../components/dialogs/AddMemberDialog'));
 import {useErrors} from '../hooks/hook';
 import {LayoutLoader} from '../components/layout/Loaders'
+import toast from 'react-hot-toast';
 
 const isAddMember = false;
 
@@ -19,19 +20,45 @@ const Groups = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [groupName,setGroupName] = useState('');
   const [confiremDeleteDialog, setConfirmDeleteDialog] = useState(false);
+  const [members, setMembers] = useState([]);
 
   const [groupNameUpdatedValue,setGroupNameUpdatedValue] = useState('')
   const chatId = useSearchParams()[0].get('group');
   const navigate = useNavigate();
 
   const myGroups = useMyGroupsQuery("");
-  console.log(myGroups.data);
+  const groupDetails = useChatDetailsQuery({chatId,populate : true},{skip: !chatId});
 
-  const errors = [{
+  const [renameGroup, { isLoading: renaming }] = useRenameGroupMutation();
+  const [removeMember, { isLoading: removingMember }] = useRemoveGroupMemberMutation();
+
+
+
+  const errors = [
+    {
     isError : myGroups.isError,
     error : myGroups.error
-  }]
+    },
+    { 
+    isError : groupDetails.isError,
+    error : groupDetails.error
+    },
+  ]
   useErrors(errors);
+  
+  useEffect(()=>{
+    if(groupDetails.data){
+      setGroupName(groupDetails.data.chatDetails?.groupName);
+      setGroupNameUpdatedValue(groupDetails.data.chatDetails?.groupName);
+      setMembers(groupDetails.data.chatDetails?.members)
+    }
+    return ()=>{
+      setGroupName('');
+      setGroupNameUpdatedValue('');
+      setMembers([]);
+      setIsEdit(false);
+    }
+  },[groupDetails.data])
 
   const navigateBack = () =>{
     navigate('/');
@@ -41,9 +68,22 @@ const Groups = () => {
     console.log("Remove member", id);
   }
   
-  const updateGroupName = () =>{
-    setIsEdit(false);
-    console.log(groupNameUpdatedValue);
+  const updateGroupName = async() =>{
+    if (!groupNameUpdatedValue.trim()) {
+      return toast.error("Group name cannot be empty");
+    }
+    try {
+      await renameGroup({ chatId, name: groupNameUpdatedValue }).unwrap();
+      toast.success("Group name updated");
+      setGroupName(groupNameUpdatedValue);
+    } 
+    catch(err){
+      toast.error(err?.data?.msg || "Failed to update group name");
+      setGroupNameUpdatedValue(groupName);
+    } 
+    finally {
+      setIsEdit(false);
+    }
   }
 
   const deleteHandler = () =>{
@@ -101,7 +141,7 @@ const Groups = () => {
         isEdit ? 
         <>
           <TextField value={groupNameUpdatedValue} onChange={e=>setGroupNameUpdatedValue(e.target.value)}  />
-          <IconButton onClick={updateGroupName}>
+          <IconButton onClick={updateGroupName} disabled={renaming}>
             <DoneIcon />
           </IconButton>
         </> : 
@@ -124,7 +164,7 @@ const Groups = () => {
   return myGroups.isLoading? <LayoutLoader /> : (
     <Grid container height={"100vh"}>
       <Grid  sx={{display:"block"}} size={4} bgcolor={"bisque"}>
-        <GroupsList myGroups={sampleChats} chatId={chatId} />
+        <GroupsList myGroups={myGroups.data?.groups} chatId={chatId} />
       </Grid>
       <Grid  
         size={8} 
@@ -153,7 +193,7 @@ const Groups = () => {
               overflow={"auto"}
             >
               {
-                sampleUsers.map((i)=>(
+                 members.map((i)=>(
                   <UserItem 
                     user={i} 
                     isAdded 
@@ -199,7 +239,7 @@ const GroupsList = ({myGroups = [],chatId}) =>(
 )
 
 const GroupListItem = memo(({group , chatId}) =>{
-  const {name,avatar,_id} = group;
+  const {groupName,avatar,_id} = group;
   return (
     <StyledLink 
       to={`?group=${_id}`} 
@@ -209,7 +249,7 @@ const GroupListItem = memo(({group , chatId}) =>{
     >
       <Stack direction={"row"} spacing={"1rem"} alignItems={"center"}>
         <AvatarCard avatar={avatar} />
-        <Typography>{name}</Typography>
+        <Typography>{groupName}</Typography>
       </Stack>
     </StyledLink>
   )
