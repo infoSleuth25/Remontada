@@ -17,11 +17,10 @@ const Notifications = () => {
     try{
       const res = await acceptRequest({requestId:_id,accept});
       if(res.data?.chat){
-        console.log("use socket here");
-        toast.success(res.data.msg);
+        toast.success(res.data?.msg);
       }
       else{
-        toast.error(res.data?.err || "Something Went wrong");
+        toast.error(res.data?.msg || "Something Went wrong");
       }
     }
     catch(err){
