@@ -114,9 +114,10 @@ const Chat = ({chatId}) => {
     setUserTyping(false);
   },[chatId]);
 
-  const alertListener = useCallback((content) =>{
+  const alertListener = useCallback((data) =>{
+    if(chatId !== data.chatId) return;
     const messageForAlert ={
-      content : content,
+      content : data.message,
       sender : {
         _id : "nrfeidlkm",
         name : "Admin"

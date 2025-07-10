@@ -1,10 +1,10 @@
 import { Avatar, Button, Dialog, DialogTitle, ListItem, Skeleton, Stack, Typography } from '@mui/material'
 import { memo } from 'react'
+import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useErrors } from '../../hooks/hook'
 import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/api/api'
 import { setIsNotification } from '../../redux/reducers/misc'
-import toast from 'react-hot-toast'
 
 
 const Notifications = () => {
