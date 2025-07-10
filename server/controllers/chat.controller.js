@@ -28,7 +28,7 @@ async function newGroupChat(req,res){
             creator : req.user._id,
             members : allGroupMembers
         })
-        emitEvent(req,ALERT,allGroupMembers,`Welcome to ${groupName} group`);
+        emitEvent(req,ALERT,allGroupMembers,{message:`Welcome to ${groupName} group`,chatId});
         emitEvent(req,REFETCH_CHATS,groupMembers);
         return res.status(201).json({
             msg : "Group is successfully created",
@@ -161,7 +161,7 @@ async function addMembers(req,res){
         await chat.save();
 
         const allUsersName = allNewMembers.map((i)=>i.name).join(", ");
-        emitEvent(req,ALERT,chat.members,`${allUsersName} have been added to the group`);
+        emitEvent(req,ALERT,chat.members,{message:`${allUsersName} have been added to the group`,chatId});
         emitEvent(req,REFETCH_CHATS,chat.members);
 
         return res.status(200).json({
@@ -224,7 +224,7 @@ async function removeMember(req,res){
         chat.members = chat.members.filter(id => id.toString() !== userId.toString());
         chat.save();
 
-        emitEvent(req,ALERT,chat.members,`${user.name} has been removed from the group`);
+        emitEvent(req,ALERT,chat.members,{message:`${user.name} has been removed from the group`,chatId});
         emitEvent(req,REFETCH_CHATS,allChatMembers);
         return res.status(200).json({
             msg: "User has been removed from the group successfully",
@@ -261,7 +261,7 @@ async function leaveGroup(req,res){
         const remainingMembers = chat.members.filter(id => id.toString() !== req.user._id.toString());
         if (remainingMembers.length < 3) {
             await Chat.findByIdAndDelete(chat._id);
-            emitEvent(req,ALERT,chat.members,`${req.user.name} has left the group & Group had less than 3 members after removal. Group has been deleted.`);
+            emitEvent(req,ALERT,chat.members,{message:`${req.user.name} has left the group & Group had less than 3 members after removal. Group has been deleted.`,chatId});
             emitEvent(req,REFETCH_CHATS,chat.members);
             return res.status(200).json({
                 msg: "Group had less than 3 members after removal. Group has been deleted.",
@@ -275,7 +275,7 @@ async function leaveGroup(req,res){
         }
         chat.members = remainingMembers;
         await chat.save();
-        emitEvent(req,ALERT,chat.members,`${req.user.name} has left the group`);
+        emitEvent(req,ALERT,chat.members,{message:`${req.user.name} has left the group`,chatId});
         return res.status(200).json({
             msg : "User has successfully left the group",
             groupDetails : chat

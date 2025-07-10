@@ -81,7 +81,7 @@ async function registerUser(req, res) {
 
     // Send response
     return res.status(201).json({
-      msg: "User successfully registered",
+      msg: `${user.name} has successfully registered`,
       user,
       token,
     });
@@ -125,7 +125,7 @@ async function loginUser(req,res){
         const token = jwt.sign({_id: user._id},process.env.JWT_SECRET,{expiresIn : '24h'});
         res.cookie('token',token);
         return res.status(200).json({
-            msg : "User is successfully logged In",
+            msg : `Welcome back ${user.name}`,
             user : user,
             token : token
         })
