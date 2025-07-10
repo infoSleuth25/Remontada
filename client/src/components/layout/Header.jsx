@@ -9,6 +9,11 @@ import { server } from '../../constants/config';
 import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
 import {setIsNewGroup, setIsNotification, setIsSearch} from '../../redux/reducers/misc'
+import { resetChat } from '../../redux/reducers/chat';
+import { resetMisc } from '../../redux/reducers/misc';
+import api from '../../redux/api/api'
+
+
 
 import toast from 'react-hot-toast'
 import { resetNotification } from '../../redux/reducers/chat'
@@ -40,7 +45,11 @@ const Header = () => {
   const logoutHandler = async() =>{
     try{
       const {data} = await axios.get(`${server}/api/v1/user/logout`,{withCredentials:true});
+      dispatch(resetChat());
       dispatch(userNotExists());
+      dispatch(resetMisc());
+      dispatch(api.util.resetApiState());
+      localStorage.clear(); 
       toast.success(data.msg);
     }
     catch(err){

@@ -42,6 +42,7 @@ const miscSlice = createSlice({
         setSelectedDeleteChat :(state,action) =>{
             state.selectedDeleteChat = action.payload;
         }, 
+        resetMisc: () => initialState
     }
 });
 
@@ -54,5 +55,6 @@ export const {
     setIsFileMenu,
     setIsDeleteMenu,
     setUploadingLoader,
-    setSelectedDeleteChat
+    setSelectedDeleteChat,
+    resetMisc
 } = miscSlice.actions;
