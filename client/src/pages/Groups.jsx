@@ -1,20 +1,19 @@
-import { Add as AddIcon, Delete as DeleteIcon, Done as DoneIcon, Edit as EditIcon, KeyboardBackspace as KeyboardBackspaceIcon} from '@mui/icons-material';
-import { Backdrop, Button, Grid, Icon, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import React, { lazy, memo, Suspense, useEffect, useState } from 'react'
-import { matBlack } from '../constants/color';
-import {useNavigate, useSearchParams} from 'react-router-dom'
-import { StyledLink } from '../components/styles/StyledComponent';
-import AvatarCard from '../components/shared/AvatarCard';
-import {sampleChats, sampleUsers} from '../constants/sampleData';
-import UserItem from '../components/shared/UserItem';
-import { useAddGroupMembersMutation, useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/api/api';
-const ConfirmDeleteDialog = lazy(()=>import('../components/dialogs/ConfirmDeleteDialog'));
-const AddMemberDialog = lazy(()=>import('../components/dialogs/AddMemberDialog'));
-import {useErrors} from '../hooks/hook';
-import {LayoutLoader} from '../components/layout/Loaders'
+import { Add as AddIcon, Delete as DeleteIcon, Done as DoneIcon, Edit as EditIcon, KeyboardBackspace as KeyboardBackspaceIcon } from '@mui/icons-material';
+import { Backdrop, Button, CircularProgress, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import {setIsAddMember} from '../redux/reducers/misc';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { LayoutLoader } from '../components/layout/Loaders';
+import AvatarCard from '../components/shared/AvatarCard';
+import UserItem from '../components/shared/UserItem';
+import { StyledLink } from '../components/styles/StyledComponent';
+import { matBlack } from '../constants/color';
+import { useErrors } from '../hooks/hook';
+import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/api/api';
+import { setIsAddMember } from '../redux/reducers/misc';
+const ConfirmDeleteDialog = lazy(()=>import('../components/dialogs/ConfirmDeleteDialog'));
+const AddMemberDialog = lazy(()=>import('../components/dialogs/AddMemberDialog'));
 
 
 const Groups = () => {
@@ -34,6 +33,7 @@ const Groups = () => {
 
   const [renameGroup, { isLoading: renaming }] = useRenameGroupMutation();
   const [removeMember, { isLoading: removingMember }] = useRemoveGroupMemberMutation();
+  const [deleteGroup, { isLoading: deletingGroup }] = useDeleteChatMutation();
 
 
 
@@ -99,9 +99,17 @@ const Groups = () => {
     }
   }
 
-  const deleteHandler = () =>{
-    console.log('deleteHandler');
-    closeConfirmDeleteHandler();
+  const deleteHandler = async() =>{
+    try {
+      await deleteGroup(chatId).unwrap();
+      toast.success("Group deleted successfully");
+      closeConfirmDeleteHandler();
+      navigate('/groups');
+    } 
+    catch (err) {
+      toast.error(err?.data?.msg || "Failed to delete group");
+      closeConfirmDeleteHandler();
+    }
   }
 
   const openConfirmDeleteHandler = () => {
@@ -205,7 +213,7 @@ const Groups = () => {
               height={"50vh"}
               overflow={"auto"}
             >
-              {
+              {removingMember? <CircularProgress /> :
                  members.map((i)=>(
                   <UserItem 
                     user={i} 

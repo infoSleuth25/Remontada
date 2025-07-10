@@ -12,6 +12,7 @@ import Title from '../shared/Title';
 import Profile from '../specific/Profile';
 import Header from './Header';
 import { getOrSaveFromStorage } from '../../lib/features';
+import { setIsDeleteMenu } from '../../redux/reducers/misc';
 
 const AppLayout = ()=> (WrappedComponent) => {
   return (props)=>{
@@ -33,7 +34,7 @@ const AppLayout = ()=> (WrappedComponent) => {
         },[newMessagesAlert])
 
         const handleDeleteChat = (e,_id,groupChat) =>{
-            e.preventDefault();
+            dispatch(setIsDeleteMenu(true));
             console.log("Delete Chat",_id,groupChat);
         }
 
