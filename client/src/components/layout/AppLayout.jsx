@@ -4,16 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events';
 import { useErrors, useSocketEvents } from '../../hooks/hook';
+import { getOrSaveFromStorage } from '../../lib/features';
 import { useMyChatsQuery } from '../../redux/api/api';
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat';
+import { setIsDeleteMenu, setSelectedDeleteChat } from '../../redux/reducers/misc';
 import { getSocket } from '../../socket';
 import ChatList from '../dialogs/ChatList';
+import DeleteChatMenu from '../dialogs/DeleteChatMenu';
 import Title from '../shared/Title';
 import Profile from '../specific/Profile';
 import Header from './Header';
-import { getOrSaveFromStorage } from '../../lib/features';
-import { setIsDeleteMenu, setSelectedDeleteChat } from '../../redux/reducers/misc';
-import DeleteChatMenu from '../dialogs/DeleteChatMenu';
 
 const AppLayout = ()=> (WrappedComponent) => {
   return (props)=>{
