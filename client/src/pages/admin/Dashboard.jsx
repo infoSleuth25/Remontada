@@ -10,7 +10,6 @@ import { useDashboardStatsQuery } from '../../redux/api/api'
 
 const Dashboard = () => {
   const {data,isLoading,} = useDashboardStatsQuery();
-  console.log(data);
   const {stats} = data || {};
   const singleChatCount = stats ? stats.totalChatsCount - stats.groupsCount : 0;
   const Appbar = (

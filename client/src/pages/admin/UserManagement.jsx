@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../../components/layout/AdminLayout'
 import Table from '../../components/shared/Table'
-import { Avatar } from '@mui/material';
+import { Avatar, Skeleton } from '@mui/material';
 import { dashboardData } from '../../constants/sampleData';
 import {transformImage} from '../../lib/features';
+import { useAdminAllUsersQuery } from '../../redux/api/api';
 
 const columns = [
   {
@@ -47,12 +48,18 @@ const columns = [
 
 const UserManagement = () => {
   const [rows,setRows] = useState([])
+  const {data,isLoading} = useAdminAllUsersQuery();
+  console.log(data);
   useEffect(()=>{
-    setRows(dashboardData.users.map((i)=>({...i,id:i._id, avatar:transformImage(i.avatar,50)})));
-  },[])
+    if(data){
+      setRows(data.users.map((i)=>({...i,id:i._id, avatar:transformImage(i.avatar,50)})));
+    }
+  },[data])
   return (
     <AdminLayout>
-        <Table heading={"All users"} columns={columns} rows={rows} />
+        {
+          isLoading ? <Skeleton /> : <Table heading={"All users"} columns={columns} rows={rows} />
+        }
     </AdminLayout>
   )
 }
