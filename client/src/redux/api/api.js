@@ -166,6 +166,13 @@ const api = createApi({
             }),
             providesTags : ["DashboardChats"]
         }),
+        adminAllMessages : builder.query({
+            query: () => ({
+                url : `/admin/messages`,
+                credentials : "include"
+            }),
+            providesTags : ["DashboardChats"]
+        }),
     }),
 });
 
@@ -189,5 +196,6 @@ export const{
     useLeaveGroupMutation,
     useDashboardStatsQuery,
     useAdminAllUsersQuery,
-    useAdminAllChatsQuery
+    useAdminAllChatsQuery,
+    useAdminAllMessagesQuery
 } = api;

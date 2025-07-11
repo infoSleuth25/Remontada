@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
-import Table from '../../components/shared/Table'
-import { Avatar, Box, Stack } from '@mui/material';
-import { dashboardData } from '../../constants/sampleData';
-import {fileFormat, transformImage} from '../../lib/features';
-import AvatarCard from '../../components/shared/AvatarCard'
+import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { Avatar, Box, Skeleton, Stack } from '@mui/material';
 import moment from 'moment';
-import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Group as GroupIcon, Person as PersonIcon } from '@mui/icons-material'
-import RenderAttachment from '../../components/shared/RenderAttachment'
+import { useEffect, useState } from 'react';
+import AdminLayout from '../../components/layout/AdminLayout';
+import RenderAttachment from '../../components/shared/RenderAttachment';
+import Table from '../../components/shared/Table';
+import { fileFormat, transformImage } from '../../lib/features';
+import { useAdminAllMessagesQuery } from '../../redux/api/api';
 
 const columns = [
   {
@@ -84,9 +83,10 @@ const columns = [
 ];
 
 const MessageManagement = () => {
+  const {data,isLoading} = useAdminAllMessagesQuery();
   const [rows,setRows] = useState([])
   useEffect(()=>{
-    setRows(dashboardData.messages.map((i)=>({
+    setRows(data.messages.map((i)=>({
       ...i,
       id : i._id,
       sender : {
@@ -98,7 +98,9 @@ const MessageManagement = () => {
   },[])
   return (
     <AdminLayout>
-        <Table heading={"All Messages"} columns={columns} rows={rows}  rowHeight={200} />
+      {
+        isLoading ? <Skeleton /> : <Table heading={"All Messages"} columns={columns} rows={rows}  rowHeight={200} />
+      }     
     </AdminLayout>
   )
 }

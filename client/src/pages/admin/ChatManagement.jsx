@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
-import Table from '../../components/shared/Table'
 import { Avatar, Skeleton, Stack } from '@mui/material';
-import { dashboardData } from '../../constants/sampleData';
-import {transformImage} from '../../lib/features';
-import AvatarCard from '../../components/shared/AvatarCard'
+import { useEffect, useState } from 'react';
+import AdminLayout from '../../components/layout/AdminLayout';
+import AvatarCard from '../../components/shared/AvatarCard';
+import Table from '../../components/shared/Table';
+import { transformImage } from '../../lib/features';
 import { useAdminAllChatsQuery } from '../../redux/api/api';
 
 const columns = [
@@ -68,7 +67,6 @@ const columns = [
 
 const ChatManagement = () => {
   const {data,isLoading} = useAdminAllChatsQuery();
-  console.log(data);
   const [rows,setRows] = useState([])
   useEffect(()=>{
     if(data){

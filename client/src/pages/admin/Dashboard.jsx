@@ -1,11 +1,9 @@
-import React from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
-import { Container, Paper, Stack, Typography, Box } from '@mui/material'
 import { AdminPanelSettings as AdminPanelSettingsIcon, Group as GroupIcon, Message as MessageIcon, Notifications as NotificationsIcon, Person as PersonIcon } from '@mui/icons-material'
+import { Box, Container, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import moment from 'moment'
+import AdminLayout from '../../components/layout/AdminLayout'
+import { DoughnutChart, LineChart } from '../../components/specific/Chart'
 import { CurveButton, SearchField } from '../../components/styles/StyledComponent'
-import { LineChart, DoughnutChart } from '../../components/specific/Chart';
-import {LayoutLoader} from '../../components/layout/Loaders';
 import { useDashboardStatsQuery } from '../../redux/api/api'
 
 const Dashboard = () => {
@@ -40,8 +38,10 @@ const Dashboard = () => {
     </Stack>
   )
 
-  return isLoading ? <LayoutLoader /> : ( 
+  return ( 
     <AdminLayout>
+      {
+        isLoading ? <Skeleton /> :  
         <Container component={"main"}>
           {Appbar}
           <Stack direction={"row"} spacing={'2rem'} flexWrap={"wrap"} justifyContent={"center"}>
@@ -92,6 +92,8 @@ const Dashboard = () => {
             Widgets
           }
         </Container>
+      }
+       
     </AdminLayout>
   )
 }

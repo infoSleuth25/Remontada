@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
-import Table from '../../components/shared/Table'
 import { Avatar, Skeleton } from '@mui/material';
-import { dashboardData } from '../../constants/sampleData';
-import {transformImage} from '../../lib/features';
+import { useEffect, useState } from 'react';
+import AdminLayout from '../../components/layout/AdminLayout';
+import Table from '../../components/shared/Table';
+import { transformImage } from '../../lib/features';
 import { useAdminAllUsersQuery } from '../../redux/api/api';
 
 const columns = [
@@ -49,7 +48,6 @@ const columns = [
 const UserManagement = () => {
   const [rows,setRows] = useState([])
   const {data,isLoading} = useAdminAllUsersQuery();
-  console.log(data);
   useEffect(()=>{
     if(data){
       setRows(data.users.map((i)=>({...i,id:i._id, avatar:transformImage(i.avatar,50)})));
