@@ -174,7 +174,7 @@ async function adminLogin(req,res){
         const token = jwt.sign(secretKey,process.env.JWT_SECRET);
         res.cookie('admintoken',token);
         return res.status(200).json({
-            msg : "You have successfully logged In",
+            msg : "Admin has successfully logged In",
             token : token
         })
     }

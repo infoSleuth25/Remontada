@@ -124,8 +124,6 @@ const Groups = () => {
     dispatch(setIsAddMember(true));
   }
 
-
-
   const IconBtns = <>
     <Tooltip title="back" >
       <IconButton sx={{

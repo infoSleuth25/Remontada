@@ -2,6 +2,7 @@ import { Dashboard as DashboardIcon, ExitToApp as ExitToAppIcon, Groups as Group
 import { Grid, Stack, styled, Typography } from '@mui/material';
 import { Link as LinkComponent, Navigate, useLocation } from 'react-router-dom';
 import { graycolor, matBlack } from '../../constants/color';
+import { useSelector } from "react-redux";
 
 const Link = styled(LinkComponent)`
     text-decoration : none;
@@ -37,9 +38,9 @@ const adminTabs = [
     },
 ] 
 
-const isAdmin = true;
 
 const AdminLayout = ({children}) => {
+    const {isAdmin} = useSelector((state)=>state.auth);
     const logoutHandler = () =>{
         console.log("Log out");
     }
