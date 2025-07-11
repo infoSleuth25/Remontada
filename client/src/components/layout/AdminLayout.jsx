@@ -2,7 +2,8 @@ import { Dashboard as DashboardIcon, ExitToApp as ExitToAppIcon, Groups as Group
 import { Grid, Stack, styled, Typography } from '@mui/material';
 import { Link as LinkComponent, Navigate, useLocation } from 'react-router-dom';
 import { graycolor, matBlack } from '../../constants/color';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogout } from "../../redux/thunks/admin";
 
 const Link = styled(LinkComponent)`
     text-decoration : none;
@@ -61,6 +62,11 @@ const AdminLayout = ({children}) => {
 
 const Siderbar =() =>{
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const logoutHandler = ()=>{
+        dispatch(adminLogout());
+    }
     return (
         <Stack width={"100%"} direction={"column"} p={"3rem"} spacing={"3rem"}>
             <Typography variant='h5' textTransform={"uppercase"}>Remontada</Typography>
@@ -85,7 +91,7 @@ const Siderbar =() =>{
                         </Link>
                     ))
                 }
-                <Link>
+                <Link onClick={logoutHandler}>
                     <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}> 
                         <ExitToAppIcon /> 
                         <Typography>Logout</Typography>

@@ -112,49 +112,62 @@ async function getAllMessages(req,res){
     }
 }
 
-async function getDashboardStats(req,res){
-    try{
-        const [groupsCount,usersCount, messagesCount, totalChatsCount] = await Promise.all([
-            Chat.countDocuments({groupChat:true}),
-            User.countDocuments(),
-            Message.countDocuments(),
-            Chat.countDocuments()
-        ])
-        const today = new Date();
-        const last7Days = new Date();
-        last7Days.setDate(last7Days.getDate()-7);
-        const last7DaysMessages = await Message.find({
-            createdAt : {
-                $gte : last7Days,
-                $lte : today
-            }
-        }).select("createdAt");
-        const messages = new Array(7).fill(0);
-        const dayinMiliSeconds = 1000*60*60*24;
-        console.log(dayinMiliSeconds);
-        last7DaysMessages.forEach(message=>{
-            const index = Math.floor((today.getTime() - message.createdAt.getTime() ) / dayinMiliSeconds);
-            messages[6-index]++;
-        })
-        const stats = {
-            groupsCount,
-            usersCount,
-            messagesCount, 
-            totalChatsCount,
-            messagesChart : messages
-        }
-        return res.status(200).json({
-            msg : "Dashboard stats received successfully",
-            stats : stats
-        })
-    }
-    catch(err){
-        return res.status(500).json({
-            msg : "Internal server error",
-            err : err.message
-        })      
-    }
+async function getDashboardStats(req, res) {
+  try {
+    const [groupsCount, usersCount, messagesCount, totalChatsCount] = await Promise.all([
+      Chat.countDocuments({ groupChat: true }),
+      User.countDocuments(),
+      Message.countDocuments(),
+      Chat.countDocuments()
+    ]);
+
+    // Align 'today' to midnight
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const last7Days = new Date(today);
+    last7Days.setDate(today.getDate() - 6);
+
+    const last7DaysMessages = await Message.find({
+      createdAt: {
+        $gte: last7Days,
+        $lte: new Date() 
+      }
+    }).select("createdAt");
+
+    const messages = new Array(7).fill(0);
+    const dayInMilliseconds = 1000 * 60 * 60 * 24;
+
+    last7DaysMessages.forEach((message) => {
+      const msgDate = new Date(message.createdAt);
+      msgDate.setHours(0, 0, 0, 0); // Align message date to midnight
+      const diff = msgDate.getTime() - last7Days.getTime();
+      const dayIndex = Math.floor(diff / dayInMilliseconds);
+      if (dayIndex >= 0 && dayIndex < 7) {
+        messages[dayIndex]++;
+      }
+    });
+
+    const stats = {
+      groupsCount,
+      usersCount,
+      messagesCount,
+      totalChatsCount,
+      messagesChart: messages
+    };
+
+    return res.status(200).json({
+      msg: "Dashboard stats received successfully",
+      stats
+    });
+  } catch (err) {
+    return res.status(500).json({
+      msg: "Internal server error",
+      err: err.message
+    });
+  }
 }
+
 
 async function adminLogin(req,res){
     try{
@@ -202,4 +215,10 @@ async function adminLogout(req,res){
     }
 }
 
-export {getAllUsers, getAllChats, getAllMessages, getDashboardStats, adminLogin, adminLogout};
+async function getAdminData(req,res){
+    return res.status(200).json({
+        admin : true
+    })
+}
+
+export {getAllUsers, getAllChats, getAllMessages, getDashboardStats, adminLogin, adminLogout, getAdminData};

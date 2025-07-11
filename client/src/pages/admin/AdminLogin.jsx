@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
 import {CameraAlt as CameraAltIcon} from '@mui/icons-material'
 import { useInputValidation } from '6pp'
 import { Navigate } from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import { adminLogin } from '../../redux/thunks/admin';
+import { adminLogin, getAdmin } from '../../redux/thunks/admin';
 
 
 const AdminLogin = () => {
@@ -16,6 +16,11 @@ const AdminLogin = () => {
         console.log("submit");
         dispatch(adminLogin(secretKey.value));
     }
+    
+    useEffect(()=>{
+      dispatch(getAdmin());
+    },[dispatch])
+
     if(isAdmin){
         return <Navigate to='/admin/dashboard' />
     }
