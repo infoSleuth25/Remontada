@@ -28,7 +28,7 @@ async function newGroupChat(req,res){
             creator : req.user._id,
             members : allGroupMembers
         })
-        emitEvent(req,ALERT,allGroupMembers,{message:`Welcome to ${groupName} group`,chatId});
+        emitEvent(req,ALERT,allGroupMembers,{message:`Welcome to ${groupName} group`,chatId: chat._id });
         emitEvent(req,REFETCH_CHATS,groupMembers);
         return res.status(201).json({
             msg : "Group is successfully created",

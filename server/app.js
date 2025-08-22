@@ -39,7 +39,7 @@ app.use(cors(corsOptions))
 import userRoutes from './routes/user.route.js';
 import chatRoutes from './routes/chat.route.js';
 import adminRoutes from './routes/admin.route.js';
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './constants/events.js';
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING,REFETCH_CHATS } from './constants/events.js';
 import { getSockets } from './utils/features.js';
 import Message from './models/message.model.js';
 import { socketAuthenticator } from './middlewares/socketAuthenticator.js';
@@ -108,6 +108,10 @@ io.on("connection",(socket)=>{
         userSocketIDs.delete(user._id.toString());
         console.log("Socket disconnected");
     })
+    socket.on(REFETCH_CHATS, ({ members }) => {
+        const membersSockets = getSockets(members);
+        io.to(membersSockets).emit(REFETCH_CHATS);
+    });
 })
 
 server.listen(port,()=>{
